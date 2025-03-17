@@ -12,6 +12,7 @@ Base.metadata.create_all(bind=engine)
 # Register API routes
 app.include_router(user.router, prefix="/api")
 
+# Teste
 @app.get("/")
 def read_root():
     return {"message": "FastAPI running inside Docker!"}
