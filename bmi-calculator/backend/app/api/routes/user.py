@@ -22,12 +22,12 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
 
-@router.get("/users")
+@router.get("/")
 def get_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
 
-@router.post("/users/register")
+@router.post("/register")
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -43,7 +43,7 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
 
     return {"message": "User created successfully"}
 
-@router.post("/users/login", response_model=TokenResponse)
+@router.post("/login", response_model=TokenResponse)
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password_hash):
