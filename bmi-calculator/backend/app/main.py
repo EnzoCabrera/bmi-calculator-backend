@@ -20,7 +20,7 @@ Base.metadata.create_all(bind=engine)
 
 # Register API routes
 app.include_router(user.router, prefix="/api/users")
-app.include_router(bmi.router, prefix="/api/bmi")
+app.include_router(bmi.router, prefix="/api/calculate")
 
 # Teste
 @app.get("/")
