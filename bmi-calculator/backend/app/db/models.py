@@ -20,7 +20,7 @@ class BMIStatus(Base):
     id = Column(Integer, primary_key=True)
 
     user_bmi = relationship("UserBMI", back_populates="bmi_status")
-    exercises = relationship("Exercise", back_populates="bmi_status")
+    trainings = relationship("Training", back_populates="bmi_status")
     diets = relationship("Diet", back_populates="bmi_status")
 
 class UserBMI(Base):
@@ -35,11 +35,10 @@ class UserBMI(Base):
     user = relationship("User")
     bmi_status = relationship("BMIStatus", back_populates="user_bmi")
 
-class Exercise(Base):
-    __tablename__ = "exercises"
+class Training(Base):
+    __tablename__ = "trainings"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=False)
@@ -50,9 +49,32 @@ class Diet(Base):
     __tablename__ = "diets"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, nullable=False)
     description = Column(String, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=False)
 
     bmi_status = relationship("BMIStatus", back_populates="diets")
+
+class Exercises(Base):
+    __tablename__ = "exercises"
+
+    id = Column(Integer, primary_key=True, index=True)
+    trainings_id = Column(Integer, ForeignKey("trainings.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
+
+    training = relationship("Training", back_populates="exercises")
+    bmi_status = relationship("BMIStatus", back_populates="exercises")
+
+class Meal(Base):
+    __tablename__ = "meals"
+
+    id = Column(Integer, primary_key=True, index=True)
+    diets_id = Column(Integer, ForeignKey("diets.id"), nullable=False)
+    title = Column(String, nullable=False)
+    description = Column(String, nullable=False)
+    bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
+
+    diet = relationship("Diet", back_populates="meals")
+    bmi_status = relationship("BMIStatus")
