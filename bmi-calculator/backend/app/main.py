@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.api.routes import user, bmi
+from app.api.routes import user, bmi, diet
 from app.db.session import engine
 from app.db.models import Base
 from fastapi.middleware.cors import CORSMiddleware
@@ -21,6 +21,7 @@ Base.metadata.create_all(bind=engine)
 # Register API routes
 app.include_router(user.router, prefix="/api/users")
 app.include_router(bmi.router, prefix="/api/calculate")
+app.include_router(diet.router, prefix="/api/diets")
 
 # Teste
 @app.get("/")
