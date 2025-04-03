@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func, Text
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
@@ -44,7 +44,7 @@ class Training(Base):
     __tablename__ = "trainings"
 
     id = Column(Integer, primary_key=True, index=True)
-    description = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=True)
     free_time = Column(Integer, nullable=False)
