@@ -13,6 +13,7 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user_bmi = relationship("UserBMI", back_populates="user")
+    trainings = relationship("Training", back_populates="user")
 
 class BMIStatus(Base):
     __tablename__ = "bmi_status"
@@ -47,10 +48,9 @@ class Training(Base):
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=False)
 
-    bmi_status = relationship("BMIStatus", back_populates="trainings")  # Fixed the relationship name
-
-    # Define the exercises related to this training
-    exercises = relationship("Exercises", back_populates="training")  # Added exercises
+    user = relationship("User", back_populates="trainings")
+    bmi_status = relationship("BMIStatus", back_populates="trainings")
+    exercises = relationship("Exercises", back_populates="training")
 
 class Diet(Base):
     __tablename__ = "diets"
