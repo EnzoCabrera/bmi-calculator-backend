@@ -47,6 +47,7 @@ class Training(Base):
     description = Column(String, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=False)
+    free_time = Column(Integer, nullable=False)
 
     user = relationship("User", back_populates="trainings")
     bmi_status = relationship("BMIStatus", back_populates="trainings")
