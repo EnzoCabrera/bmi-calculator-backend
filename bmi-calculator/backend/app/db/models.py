@@ -46,8 +46,9 @@ class Training(Base):
     id = Column(Integer, primary_key=True, index=True)
     description = Column(String, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-    image_path = Column(String, nullable=False)
+    image_path = Column(String, nullable=True)
     free_time = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     user = relationship("User", back_populates="trainings")
     bmi_status = relationship("BMIStatus", back_populates="trainings")
@@ -61,9 +62,7 @@ class Diet(Base):
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=False)
 
-    bmi_status = relationship("BMIStatus", back_populates="diets")  # Fixed the relationship name
-
-    # Define meals related to this diet
+    bmi_status = relationship("BMIStatus", back_populates="diets")
     meals = relationship("Meal", back_populates="diet")  # Added meals
 
 class Exercises(Base):
@@ -75,7 +74,7 @@ class Exercises(Base):
     description = Column(String, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
 
-    training = relationship("Training", back_populates="exercises")  # Fixed the relationship name
+    training = relationship("Training", back_populates="exercises")
     bmi_status = relationship("BMIStatus", back_populates="exercises")
 
 class Meal(Base):
@@ -88,4 +87,4 @@ class Meal(Base):
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
 
     diet = relationship("Diet", back_populates="meals")
-    bmi_status = relationship("BMIStatus", back_populates="meals")  # Fixed the relationship name
+    bmi_status = relationship("BMIStatus", back_populates="meals")
