@@ -30,6 +30,7 @@ def trainings_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_cur
     training: Training = (
         db.query(Training)
         .filter(Training.user_id == user.id)
+        .order_by(Training.id.desc())
         .first()
     )
     return training

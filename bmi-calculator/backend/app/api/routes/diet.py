@@ -26,14 +26,13 @@ def diets_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_current
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-
     diet: Diet = (
         db.query(Diet)
-        .filter(Diet.bmi_status_id == user_diet.bmi_status_id)
+        .filter(Diet.user_id == user.id)
+        .order_by(Diet.id.desc())
         .first()
     )
     return diet
-
 
 class DietResponse(BaseModel):
     id: int
