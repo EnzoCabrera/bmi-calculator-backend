@@ -14,6 +14,7 @@ class User(Base):
 
     user_bmi = relationship("UserBMI", back_populates="user")
     trainings = relationship("Training", back_populates="user")
+    diets = relationship("Diet", back_populates="user")
 
 class BMIStatus(Base):
     __tablename__ = "bmi_status"
@@ -24,8 +25,6 @@ class BMIStatus(Base):
     trainings = relationship("Training", back_populates="bmi_status")
     diets = relationship("Diet", back_populates="bmi_status")
     exercises = relationship("Exercises", back_populates="bmi_status")
-
-    # Add the missing relationship
     meals = relationship("Meal", back_populates="bmi_status")
 
 class UserBMI(Base):
@@ -58,12 +57,14 @@ class Diet(Base):
     __tablename__ = "diets"
 
     id = Column(Integer, primary_key=True, index=True)
-    description = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-    image_path = Column(String, nullable=False)
+    image_path = Column(String, nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
+    user = relationship("User", back_populates="diets")
     bmi_status = relationship("BMIStatus", back_populates="diets")
-    meals = relationship("Meal", back_populates="diet")  # Added meals
+    meals = relationship("Meal", back_populates="diet")
 
 class Exercises(Base):
     __tablename__ = "exercises"

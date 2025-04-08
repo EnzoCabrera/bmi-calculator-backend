@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
-from app.utils.openai_configs import generate_training_with_openai
+from app.utils.openai_configs_trainings import generate_training_with_openai
 from app.db.models import Training
 
 router = APIRouter()
