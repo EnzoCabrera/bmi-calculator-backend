@@ -27,12 +27,12 @@ def diets_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_current
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
 
-    diets_list: Diet = (
+    diet: Diet = (
         db.query(Diet)
         .filter(Diet.bmi_status_id == user_diet.bmi_status_id)
-        .all()
+        .first()
     )
-    return diets_list
+    return diet
 
 
 class DietResponse(BaseModel):
