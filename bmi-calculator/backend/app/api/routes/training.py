@@ -14,7 +14,6 @@ def get_trainings(db: Session = Depends(get_db)):
     trainings = db.query(Training).all()
     return trainings
 
-
 @router.get("/by-BMI")
 def trainings_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_training: UserBMI = (
@@ -28,13 +27,13 @@ def trainings_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_cur
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
-    trainings_list: Training = (
+    training: Training = (
         db.query(Training)
-        .filter(Training.bmi_status_id == user_training.bmi_status_id)
-        .all()
+        .filter(Training.user_id == user.id)
+        .order_by(Training.id.desc())
+        .first()
     )
-    return trainings_list
-
+    return training
 
 class TrainingCreate(BaseModel):
     free_time: int

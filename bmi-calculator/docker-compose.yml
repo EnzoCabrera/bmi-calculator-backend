@@ -3,6 +3,8 @@ services:
     image: postgres:15
     container_name: bmi_calculator_postgres
     restart: always
+    env_file:
+      - ./backend/.env
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
@@ -16,6 +18,8 @@ services:
     build: ./backend
     container_name: bmi_calculator_fastapi
     restart: always
+    env_file:
+      - ./backend/.env
     depends_on:
       - postgres
     environment:
