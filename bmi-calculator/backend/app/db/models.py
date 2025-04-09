@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func, Text
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
@@ -13,6 +13,8 @@ class User(Base):
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user_bmi = relationship("UserBMI", back_populates="user")
+    trainings = relationship("Training", back_populates="user")
+    diets = relationship("Diet", back_populates="user")
 
 class BMIStatus(Base):
     __tablename__ = "bmi_status"
@@ -23,8 +25,6 @@ class BMIStatus(Base):
     trainings = relationship("Training", back_populates="bmi_status")
     diets = relationship("Diet", back_populates="bmi_status")
     exercises = relationship("Exercises", back_populates="bmi_status")
-
-    # Add the missing relationship
     meals = relationship("Meal", back_populates="bmi_status")
 
 class UserBMI(Base):
@@ -43,27 +43,28 @@ class Training(Base):
     __tablename__ = "trainings"
 
     id = Column(Integer, primary_key=True, index=True)
-    description = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-    image_path = Column(String, nullable=False)
+    image_path = Column(String, nullable=True)
+    free_time = Column(Integer, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    bmi_status = relationship("BMIStatus", back_populates="trainings")  # Fixed the relationship name
-
-    # Define the exercises related to this training
-    exercises = relationship("Exercises", back_populates="training")  # Added exercises
+    user = relationship("User", back_populates="trainings")
+    bmi_status = relationship("BMIStatus", back_populates="trainings")
+    exercises = relationship("Exercises", back_populates="training")
 
 class Diet(Base):
     __tablename__ = "diets"
 
     id = Column(Integer, primary_key=True, index=True)
-    description = Column(String, nullable=False)
+    description = Column(Text, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-    image_path = Column(String, nullable=False)
+    image_path = Column(String, nullable=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
-    bmi_status = relationship("BMIStatus", back_populates="diets")  # Fixed the relationship name
-
-    # Define meals related to this diet
-    meals = relationship("Meal", back_populates="diet")  # Added meals
+    user = relationship("User", back_populates="diets")
+    bmi_status = relationship("BMIStatus", back_populates="diets")
+    meals = relationship("Meal", back_populates="diet")
 
 class Exercises(Base):
     __tablename__ = "exercises"
@@ -74,7 +75,7 @@ class Exercises(Base):
     description = Column(String, nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
 
-    training = relationship("Training", back_populates="exercises")  # Fixed the relationship name
+    training = relationship("Training", back_populates="exercises")
     bmi_status = relationship("BMIStatus", back_populates="exercises")
 
 class Meal(Base):
@@ -87,4 +88,4 @@ class Meal(Base):
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
 
     diet = relationship("Diet", back_populates="meals")
-    bmi_status = relationship("BMIStatus", back_populates="meals")  # Fixed the relationship name
+    bmi_status = relationship("BMIStatus", back_populates="meals")
