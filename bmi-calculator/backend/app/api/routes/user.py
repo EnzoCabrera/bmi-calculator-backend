@@ -22,11 +22,13 @@ class TokenResponse(BaseModel):
     access_token: str
     token_type: str
 
+# Getting all users in the DB
 @router.get("/")
 def get_users(db: Session = Depends(get_db)):
     users = db.query(User).all()
     return users
 
+# Creating a new user and saving to the DB
 @router.post("/register")
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
@@ -43,6 +45,7 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
 
     return {"message": "User created successfully"}
 
+# Creating a JWT token if the inputted email and password are found in the DB
 @router.post("/login", response_model=TokenResponse)
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
