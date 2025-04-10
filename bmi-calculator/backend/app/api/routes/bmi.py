@@ -12,6 +12,7 @@ class CalculateBMI(BaseModel):
     weight: float
     height: float
 
+# Calculating the user's BMI and saving it to the DB
 @router.post("/bmi")
 def get_bmi(data: CalculateBMI, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     if data.height <= 0:
