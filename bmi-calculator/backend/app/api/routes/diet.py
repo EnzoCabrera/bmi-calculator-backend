@@ -13,8 +13,8 @@ def get_diets(db: Session = Depends(get_db)):
     diets = db.query(Diet).all()
     return diets
 
-@router.get("/by-BMI")
-def diets_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+@router.get("/by-id")
+def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_diet: UserBMI = (
         db.query(UserBMI)
         .filter(User.id == user.id)
