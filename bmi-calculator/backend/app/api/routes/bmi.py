@@ -3,7 +3,7 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.api.auth import get_current_user
 from app.db.session import get_db
-from app.services.calculation import calculate_bmi
+from app.services.bmi_service import calculate_bmi
 from app.db.models import User
 
 router = APIRouter()
