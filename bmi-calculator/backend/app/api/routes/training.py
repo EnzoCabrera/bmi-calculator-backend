@@ -8,14 +8,15 @@ from app.services.training_service import calculate_training
 
 router = APIRouter()
 
-
+# Getting all trainings in the DB
 @router.get("/get-all")
 def get_trainings(db: Session = Depends(get_db)):
     trainings = db.query(Training).all()
     return trainings
 
-@router.get("/by-BMI")
-def trainings_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+# Getting the user's training by their ID
+@router.get("/by-id")
+def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_training: UserBMI = (
         db.query(UserBMI)
         .filter(User.id == user.id)
@@ -48,7 +49,7 @@ class TrainingResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
+# Creating a new training and saving it to the DB
 @router.post("/create", response_model=TrainingResponse)
 def create_training(training: TrainingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
 

@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from app.db.models import UserBMI
 
-
+# Calculating the inputted BMI
 def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
     if height <= 0:
         raise ValueError("Altura deve ser maior que zero")

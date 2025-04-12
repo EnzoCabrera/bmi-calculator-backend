@@ -1,5 +1,5 @@
 import pytest
-from app.services.calculation import calculate_bmi
+from app.services.bmi_service import calculate_bmi
 from app.db.models import Base, UserBMI
 
 # Testing the calculator of BMI
