@@ -8,13 +8,15 @@ from app.services.diets_service import calculate_diet
 
 router = APIRouter()
 
+# Getting all diets in the DB
 @router.get("/get-all")
 def get_diets(db: Session = Depends(get_db)):
     diets = db.query(Diet).all()
     return diets
 
-@router.get("/by-BMI")
-def diets_by_BMI(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+# Getting the user's diet by their ID
+@router.get("/by-id")
+def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_diet: UserBMI = (
         db.query(UserBMI)
         .filter(User.id == user.id)
@@ -43,7 +45,7 @@ class DietResponse(BaseModel):
     class Config:
         from_attributes = True
 
-
+# Creating a new diet and saving it to the DB
 @router.post("/create", response_model=DietResponse)
 def create_diet(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
 
