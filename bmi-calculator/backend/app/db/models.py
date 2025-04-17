@@ -34,6 +34,8 @@ class UserBMI(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     bmi_value = Column(Float, nullable=False)
+    weight = Column(Float, nullable=True)
+    height = Column(Float, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="user_bmi")
