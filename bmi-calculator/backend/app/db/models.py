@@ -66,26 +66,4 @@ class Diet(Base):
     bmi_status = relationship("BMIStatus", back_populates="diets")
     meals = relationship("Meal", back_populates="diet")
 
-class Exercises(Base):
-    __tablename__ = "exercises"
 
-    id = Column(Integer, primary_key=True, index=True)
-    training_id = Column(Integer, ForeignKey("trainings.id"), nullable=False)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-
-    training = relationship("Training", back_populates="exercises")
-    bmi_status = relationship("BMIStatus", back_populates="exercises")
-
-class Meal(Base):
-    __tablename__ = "meals"
-
-    id = Column(Integer, primary_key=True, index=True)
-    diet_id = Column(Integer, ForeignKey("diets.id"), nullable=False)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-
-    diet = relationship("Diet", back_populates="meals")
-    bmi_status = relationship("BMIStatus", back_populates="meals")
