@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from app.api.openapi import custom_openapi
 from app.api.routes import user, bmi, diet, training
 from app.db.session import engine
 from app.db.models import Base
@@ -14,6 +15,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.openapi = lambda: custom_openapi(app)
 
 # Create database tables if they don't exist
 Base.metadata.create_all(bind=engine)
