@@ -24,8 +24,6 @@ class BMIStatus(Base):
     user_bmi = relationship("UserBMI", back_populates="bmi_status")
     trainings = relationship("Training", back_populates="bmi_status")
     diets = relationship("Diet", back_populates="bmi_status")
-    exercises = relationship("Exercises", back_populates="bmi_status")
-    meals = relationship("Meal", back_populates="bmi_status")
 
 class UserBMI(Base):
     __tablename__ = "user_bmi"
@@ -53,7 +51,6 @@ class Training(Base):
 
     user = relationship("User", back_populates="trainings")
     bmi_status = relationship("BMIStatus", back_populates="trainings")
-    exercises = relationship("Exercises", back_populates="training")
 
 class Diet(Base):
     __tablename__ = "diets"
@@ -66,7 +63,6 @@ class Diet(Base):
 
     user = relationship("User", back_populates="diets")
     bmi_status = relationship("BMIStatus", back_populates="diets")
-    meals = relationship("Meal", back_populates="diet")
 
 
 class History(Base):
