@@ -13,7 +13,7 @@ class CalculateBMI(BaseModel):
     height: float
 
 # Calculating the user's BMI and saving it to the DB
-@router.post("/bmi")
+@router.put("/bmi")
 def get_bmi(data: CalculateBMI, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     if data.height <= 0:
         raise HTTPException(status_code=400, detail="Height must be greater than zero")
