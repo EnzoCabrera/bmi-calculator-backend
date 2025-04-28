@@ -3,8 +3,14 @@ from app.db.models import UserBMI, History
 
 # Calculating the inputted BMI
 def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
+
+    user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user_id).order_by(UserBMI.created_at.desc()).first()
+
     if height <= 0:
         raise ValueError("Altura deve ser maior que zero")
+
+    if not user_bmi:
+        user_bmi = UserBMI(user_id=user_id)
 
     bmi = round(weight / (height ** 2), 2)
 
@@ -18,17 +24,18 @@ def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
         status_id = 4
 
 
-    user_bmi = UserBMI(
-        user_id=user_id,
-        bmi_value=bmi,
-        bmi_status_id=status_id,
-        height=height,
-        weight=weight
-    )
+    user_bmi.weight = weight
+    user_bmi.height = height
+    user_bmi.bmi_value = bmi
+    user_bmi.bmi_status_id = status_id
 
-
-
-
+    # user_bmi = UserBMI(
+    #     user_id=user_id,
+    #     bmi_value=bmi,
+    #     bmi_status_id=status_id,
+    #     height=height,
+    #     weight=weight
+    # )
 
     db.add(user_bmi)
     db.commit()
