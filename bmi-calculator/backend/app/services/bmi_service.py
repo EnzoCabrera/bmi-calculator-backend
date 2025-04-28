@@ -29,16 +29,17 @@ def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
     user_bmi.bmi_value = bmi
     user_bmi.bmi_status_id = status_id
 
-    # user_bmi = UserBMI(
-    #     user_id=user_id,
-    #     bmi_value=bmi,
-    #     bmi_status_id=status_id,
-    #     height=height,
-    #     weight=weight
-    # )
+    history = History(
+        user_id=user_id,
+        bmi_value=bmi,
+        weight=weight
+    )
 
     db.add(user_bmi)
+    db.add(history)
     db.commit()
     db.refresh(user_bmi)
+    db.refresh(history)
 
     return user_bmi
+    return history
