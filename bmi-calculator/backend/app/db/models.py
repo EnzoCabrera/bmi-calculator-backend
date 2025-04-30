@@ -24,8 +24,6 @@ class BMIStatus(Base):
     user_bmi = relationship("UserBMI", back_populates="bmi_status")
     trainings = relationship("Training", back_populates="bmi_status")
     diets = relationship("Diet", back_populates="bmi_status")
-    exercises = relationship("Exercises", back_populates="bmi_status")
-    meals = relationship("Meal", back_populates="bmi_status")
 
 class UserBMI(Base):
     __tablename__ = "user_bmi"
@@ -34,6 +32,8 @@ class UserBMI(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     bmi_value = Column(Float, nullable=False)
+    weight = Column(Float, nullable=True)
+    height = Column(Float, nullable=True)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="user_bmi")
@@ -51,7 +51,6 @@ class Training(Base):
 
     user = relationship("User", back_populates="trainings")
     bmi_status = relationship("BMIStatus", back_populates="trainings")
-    exercises = relationship("Exercises", back_populates="training")
 
 class Diet(Base):
     __tablename__ = "diets"
@@ -64,28 +63,15 @@ class Diet(Base):
 
     user = relationship("User", back_populates="diets")
     bmi_status = relationship("BMIStatus", back_populates="diets")
-    meals = relationship("Meal", back_populates="diet")
 
-class Exercises(Base):
-    __tablename__ = "exercises"
 
-    id = Column(Integer, primary_key=True, index=True)
-    training_id = Column(Integer, ForeignKey("trainings.id"), nullable=False)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
-
-    training = relationship("Training", back_populates="exercises")
-    bmi_status = relationship("BMIStatus", back_populates="exercises")
-
-class Meal(Base):
-    __tablename__ = "meals"
+class History(Base):
+    __tablename__ = "history"
 
     id = Column(Integer, primary_key=True, index=True)
-    diet_id = Column(Integer, ForeignKey("diets.id"), nullable=False)
-    title = Column(String, nullable=False)
-    description = Column(String, nullable=False)
-    bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    weight = Column(Float, nullable=False)
+    bmi_value = Column(Float, nullable=True)
+    created_at = Column(TIMESTAMP, server_default=func.now())
 
-    diet = relationship("Diet", back_populates="meals")
-    bmi_status = relationship("BMIStatus", back_populates="meals")
+
