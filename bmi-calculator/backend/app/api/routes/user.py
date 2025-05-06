@@ -23,10 +23,10 @@ class TokenResponse(BaseModel):
     token_type: str
 
 # Getting all users in the DB
-@router.get("/")
-def get_users(db: Session = Depends(get_db)):
-    users = db.query(User).all()
-    return users
+# @router.get("/")
+# def get_users(db: Session = Depends(get_db)):
+#     users = db.query(User).all()
+#     return users
 
 # Creating a new user and saving to the DB
 @router.post("/register")
