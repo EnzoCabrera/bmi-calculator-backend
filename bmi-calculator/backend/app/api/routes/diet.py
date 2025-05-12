@@ -46,13 +46,17 @@ class DietResponse(BaseModel):
         from_attributes = True
 
 # Creating a new diet and saving it to the DB
-@router.post("/create", response_model=DietResponse)
+@router.put("/create", response_model=DietResponse)
 def create_diet(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-
-    user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
+    user_bmi = db.query(UserBMI).filter(User.id == user.id).first()
 
     if not user_bmi:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IMC do usuário não encontrado")
+
+    existing_diet = db.query(Diet).filter(Diet.user_id == user.id).first()
+
+    if not existing_diet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dieta do usuário não encontrado")
 
     try:
         result = calculate_diet(
@@ -60,7 +64,7 @@ def create_diet(db: Session = Depends(get_db), user: User = Depends(get_current_
             user_bmi=user_bmi,
             bmi_status_id=user_bmi.bmi_status_id,
             user_id=user.id,
-            diet=Diet(),
+            diet=existing_diet,
         )
 
         return result
