@@ -8,34 +8,6 @@ from app.services.diets_service import calculate_diet
 
 router = APIRouter()
 
-# Getting all diets in the DB
-@router.get("/get-all")
-def get_diets(db: Session = Depends(get_db)):
-    diets = db.query(Diet).all()
-    return diets
-
-# Getting the user's diet by their ID
-@router.get("/by-id")
-def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
-    user_diet: UserBMI = (
-        db.query(UserBMI)
-        .filter(User.id == user.id)
-        .order_by(UserBMI.created_at.desc())
-        .first()
-    )
-
-    if not user_diet:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-    diet: Diet = (
-        db.query(Diet)
-        .filter(Diet.user_id == user.id)
-        .order_by(Diet.id.desc())
-        .first()
-    )
-    return diet
-
 class DietResponse(BaseModel):
     id: int
     user_id: int
@@ -44,6 +16,7 @@ class DietResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
 
 # Creating a new diet and saving it to the DB
 @router.put("/create", response_model=DietResponse)
@@ -70,3 +43,38 @@ def create_diet(db: Session = Depends(get_db), user: User = Depends(get_current_
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+
+# Getting the user's diet by their ID
+@router.get("/by-id")
+def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    user_diet: UserBMI = (
+        db.query(UserBMI)
+        .filter(User.id == user.id)
+        .order_by(UserBMI.created_at.desc())
+        .first()
+    )
+
+    if not user_diet:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+
+    diet: Diet = (
+        db.query(Diet)
+        .filter(Diet.user_id == user.id)
+        .order_by(Diet.id.desc())
+        .first()
+    )
+    return diet
+
+
+# Getting all diets in the DB
+# @router.get("/get-all")
+# def get_diets(db: Session = Depends(get_db)):
+#     diets = db.query(Diet).all()
+#     return diets
+
+
+
+
+
+
