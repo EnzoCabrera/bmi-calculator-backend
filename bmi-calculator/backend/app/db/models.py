@@ -60,6 +60,7 @@ class Diet(Base):
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    intolerances = Column(String, nullable=True)
 
     user = relationship("User", back_populates="diets")
     bmi_status = relationship("BMIStatus", back_populates="diets")

@@ -1,3 +1,5 @@
+from typing import List
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -7,6 +9,9 @@ from app.db.models import Diet, User, UserBMI
 from app.services.diets_service import calculate_diet
 
 router = APIRouter()
+
+class DietCreate(BaseModel):
+    intolerances: List[str]
 
 class DietResponse(BaseModel):
     id: int
@@ -20,7 +25,7 @@ class DietResponse(BaseModel):
 
 # Creating a new diet and saving it to the DB
 @router.put("/create", response_model=DietResponse)
-def create_diet(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_bmi = db.query(UserBMI).filter(User.id == user.id).first()
 
     if not user_bmi:
@@ -38,6 +43,7 @@ def create_diet(db: Session = Depends(get_db), user: User = Depends(get_current_
             bmi_status_id=user_bmi.bmi_status_id,
             user_id=user.id,
             diet=existing_diet,
+            intolerances=diet.intolerances
         )
 
         return result
