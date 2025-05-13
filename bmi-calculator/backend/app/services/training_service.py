@@ -22,9 +22,12 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
     status_text = status_map.get(user_bmi.bmi_status_id, "com status de IMC desconhecido")
     prompt = (
         f"Crie um treino simples para uma pessoa {status_text} com {free_time} hora{'s' if free_time > 1 else ''} livre por dia. "
-        f"Retorne apenas os exercícios e suas repetições separados por ponto e vírgula, sem explicações ou introduções. "
-        f"Não utilize quebras de linha, apenas ponto e vírgula. Exemplo de formato: 'Agachamento: 3x15; Flexão: 3x12; Prancha: 3x30s'"
-        f"Não utilize exercicios aeróbicos como corrida que usam segundos ou minutos, use apenas exercicios realizados em séries de repetição"
+        f"Independentemente da quantidade de horas livres do usuário. Crie um treino para cada dia da semana."
+        f"Os treinos devem ser desse modo: Segunda: exercicio: 4x15; exercicio: 4x12; exercicio: 3x45s; exercicio: 4x10; Terça: exercicio: 4x15; exercicio: 4x12; exercicio: 3x10; exercicio: 4x10; Quarta: exercicio: 4x15; exercicio: 4x12; exercicio: 3x45s; exercicio: 4x10; Quinta: exercicio: 4x15; exercicio: 4x12; exercicio: 3x10; exercicio: 4x10; Sexta: exercicio: 4x15; exercicio: 4x12; exercicio: 3x45s; exercicio: 4x10. Isso é apenas um exemplo a ser seguido, crie os treinos com exercícios reais."
+        f"SEMPRE utilize exercícios diversos."
+        f"NÃO utilize quebra de linha para dividir os dias da semana, apenas ponto e vírgula."
+        f"Retorne apenas os dias da semana, os exercícios e suas repetições separados por ponto e vírgula, sem explicações ou introduções."
+        f"NÃO utilize quebras de linha, apenas ponto e vírgula. Exemplo de formato: 'Agachamento: 3x15; Flexão: 3x12; Prancha: 3x30s'"
         f"Quando o usuário tiver apenas 1 hora livre por dia, ofereça no máximo 4 exercicios diferentes. Se o usuário tiver 2 horas livres por dia, ofereça 7 exercicios diferentes. Se o usuário tiver 3 horas livres por dia, ofereça 9 exercicios diferentes"
     )
 
