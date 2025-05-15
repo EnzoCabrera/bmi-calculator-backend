@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from app.utils.openai_configs_trainings import generate_training_with_openai
@@ -38,6 +40,7 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
     training.user_id = user_id
     training.bmi_status_id = bmi_status_id
     training.free_time = free_time
+    training.created_at = datetime.utcnow()
 
     db.add(training)
     db.commit()
