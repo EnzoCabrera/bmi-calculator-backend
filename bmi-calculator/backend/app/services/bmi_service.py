@@ -1,5 +1,5 @@
 from sqlalchemy.orm import Session
-from app.db.models import UserBMI, History
+from app.db.models import UserBMI
 
 # Calculating the inputted BMI
 def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
@@ -34,17 +34,10 @@ def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
     user_bmi.bmi_value = bmi
     user_bmi.bmi_status_id = status_id
 
-    history = History(
-        user_id=user_id,
-        bmi_value=bmi,
-        weight=weight
-    )
 
     db.add(user_bmi)
-    db.add(history)
     db.commit()
     db.refresh(user_bmi)
-    db.refresh(history)
+
 
     return user_bmi
-    return history
