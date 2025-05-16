@@ -7,6 +7,7 @@ from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import Diet, User, UserBMI
 from app.services.diets_service import calculate_diet
+from app.services.endpoint_limit_service import check_endpoint_limit
 
 router = APIRouter()
 
@@ -25,7 +26,7 @@ class DietResponse(BaseModel):
 
 # Creating a new diet and saving it to the DB
 @router.put("/create", response_model=DietResponse)
-def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
     user_bmi = db.query(UserBMI).filter(User.id == user.id).first()
 
     if not user_bmi:

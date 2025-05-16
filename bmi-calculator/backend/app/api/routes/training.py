@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -5,6 +7,7 @@ from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import Training, User, UserBMI
 from app.services.training_service import calculate_training
+from app.services.endpoint_limit_service import check_endpoint_limit
 
 router = APIRouter()
 
@@ -24,7 +27,7 @@ class TrainingResponse(BaseModel):
 
 # Creating a new training and saving it to the DB
 @router.put("/create", response_model=TrainingResponse)
-def create_training(training: TrainingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+def create_training(training: TrainingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
 
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
@@ -43,7 +46,7 @@ def create_training(training: TrainingCreate, db: Session = Depends(get_db), use
             bmi_status_id=user_bmi.bmi_status_id,
             user_id=user.id,
             training=existing_training,
-            free_time=training.free_time
+            free_time=training.free_time,
         )
 
         return result
