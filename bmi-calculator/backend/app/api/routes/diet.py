@@ -25,7 +25,7 @@ class DietResponse(BaseModel):
 
 
 # Creating a new diet and saving it to the DB
-@router.put("/create", response_model=DietResponse)
+@router.post("/create", response_model=DietResponse)
 def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
     user_bmi = db.query(UserBMI).filter(User.id == user.id).first()
 
@@ -34,16 +34,13 @@ def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = De
 
     existing_diet = db.query(Diet).filter(Diet.user_id == user.id).first()
 
-    if not existing_diet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Dieta do usuário não encontrado")
-
     try:
         result = calculate_diet(
             db=db,
             user_bmi=user_bmi,
             bmi_status_id=user_bmi.bmi_status_id,
             user_id=user.id,
-            diet=existing_diet,
+            diet=Diet(),
             intolerances=diet.intolerances
         )
 
