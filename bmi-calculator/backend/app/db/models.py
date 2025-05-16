@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func, Text, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
@@ -10,6 +10,7 @@ class User(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
+    is_plus = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user_bmi = relationship("UserBMI", back_populates="user")
