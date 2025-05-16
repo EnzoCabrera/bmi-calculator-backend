@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func, Text
+from sqlalchemy import Column, Integer, String, Float, ForeignKey, TIMESTAMP, func, Text, Boolean
 from sqlalchemy.orm import relationship, declarative_base
 
 Base = declarative_base()
@@ -10,6 +10,7 @@ class User(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
+    is_plus = Column(Boolean, default=False)
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user_bmi = relationship("UserBMI", back_populates="user")
@@ -48,6 +49,7 @@ class Training(Base):
     image_path = Column(String, nullable=True)
     free_time = Column(Integer, nullable=False)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="trainings")
     bmi_status = relationship("BMIStatus", back_populates="trainings")
@@ -60,18 +62,10 @@ class Diet(Base):
     bmi_status_id = Column(Integer, ForeignKey("bmi_status.id"), nullable=False)
     image_path = Column(String, nullable=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    intolerances = Column(String, nullable=True)
+    created_at = Column(TIMESTAMP, server_default=func.now())
 
     user = relationship("User", back_populates="diets")
     bmi_status = relationship("BMIStatus", back_populates="diets")
-
-
-class History(Base):
-    __tablename__ = "history"
-
-    id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
-    weight = Column(Float, nullable=False)
-    bmi_value = Column(Float, nullable=True)
-    created_at = Column(TIMESTAMP, server_default=func.now())
 
 

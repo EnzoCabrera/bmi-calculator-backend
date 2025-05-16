@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.api.openapi import custom_openapi
-from app.api.routes import user, bmi, diet, training
+from app.api.routes import user, bmi, diet, training, history
 from app.db.session import engine
 from app.db.models import Base
 from fastapi.middleware.cors import CORSMiddleware
@@ -26,6 +26,8 @@ app.include_router(user.router, prefix="/api/users")
 app.include_router(bmi.router, prefix="/api/calculate")
 app.include_router(diet.router, prefix="/api/diets")
 app.include_router(training.router, prefix="/api/trainings")
+app.include_router(history.router, prefix="/api/history")
+
 
 # Teste
 @app.get("/")
