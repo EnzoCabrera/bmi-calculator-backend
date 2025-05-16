@@ -26,26 +26,19 @@ class TrainingResponse(BaseModel):
 
 
 # Creating a new training and saving it to the DB
-@router.put("/create", response_model=TrainingResponse)
+@router.post("/create", response_model=TrainingResponse)
 def create_training(training: TrainingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
-
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
     if not user_bmi:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IMC do usuário não encontrado")
-
-    existing_training = db.query(Training).filter(Training.user_id == user.id).first()
-
-    if not existing_training:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Treino do usuário não encontrado")
-
     try:
         result = calculate_training(
             db=db,
             user_bmi=user_bmi,
             bmi_status_id=user_bmi.bmi_status_id,
             user_id=user.id,
-            training=existing_training,
+            training=Training(),
             free_time=training.free_time,
         )
 
