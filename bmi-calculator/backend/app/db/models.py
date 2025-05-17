@@ -10,7 +10,7 @@ class User(Base):
     full_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     password_hash = Column(String, nullable=False)
-    is_plus = Column(Boolean, default=False)
+    role = Column(Integer, default=1) # 1 = common, 2 = plus, 3 = admin
     created_at = Column(TIMESTAMP, server_default=func.now())
 
     user_bmi = relationship("UserBMI", back_populates="user")
