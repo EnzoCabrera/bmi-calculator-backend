@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+# environment variables for Redis
 redis_client = redis.Redis(
   host=os.getenv("REDIS_HOST"),
   port=os.getenv("REDIS_PORT"),
@@ -18,14 +19,19 @@ redis_client = redis.Redis(
   ssl=True
 )
 
+
 app = FastAPI()
 
+
+# GET variables
 GET_MAX_ATTEMPTS = 5
 GET_BLOCK_SECONDS = 10
 
+# Requesting authentication to request the GET endpoints
 def get_client_id(user: User = Depends(get_current_user)) -> str:
     return f"user:{user.id}"
 
+# Attempt limiter for GET endpoints
 def get_rate_limiter(user: User = Depends(get_current_user)):
     client_id = get_client_id(user)
     key = f"get_rate_limit:{client_id}"
@@ -44,9 +50,11 @@ def get_rate_limiter(user: User = Depends(get_current_user)):
         redis_client.set(key, 1, ex=GET_BLOCK_SECONDS)
 
 
+# POST variables
 POST_MAX_ATTEMPTS = 3
 POST_BLOCK_SECONDS = 30
 
+# Attempt limiter for POST endpoints
 def post_rate_limiter(user: User = Depends(get_current_user)):
     cliente_id = get_client_id(user)
     key = f"post_rate_limit:{cliente_id}"
@@ -65,12 +73,16 @@ def post_rate_limiter(user: User = Depends(get_current_user)):
         redis_client.set(key, 1, ex=POST_BLOCK_SECONDS)
 
 
+# auth variables
 AUTH_MAX_ATTEMPTS = 3
 AUTH_BLOCK_SECONDS = 30
 
+
+# Getting the IP of user to request the endpoint
 def auth_client_ip(request: Request) -> str:
     return request.client.host
 
+# Attempt limiter for auth endpoints
 def auth_rate_limiter(request: Request):
     client_ip = auth_client_ip(request)
     key = f"rate_limit:ip:{client_ip}"
@@ -88,7 +100,7 @@ def auth_rate_limiter(request: Request):
         redis_client.set(key, 1, ex=AUTH_BLOCK_SECONDS)
 
 
-# Endpoint limiter for diets and trainings creation
+# Endpoint limiter for diets and trainings creation, applied for common users
 def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     if user.role == 1:
         limit = datetime.utcnow() - timedelta(days=90)
@@ -99,7 +111,7 @@ def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, necessário plano plus")
 
 
-# Endpoint limiter for BMI calculation
+# Endpoint limiter for BMI calculation, applied for common users
 def check_bmi_limit(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     if user.role == 1:
         limit = datetime.utcnow() - timedelta(days=30)

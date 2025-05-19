@@ -8,7 +8,10 @@ from app.db.models import Training
 router = APIRouter()
 
 
+# Method to create the training
 def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, training:Training, free_time: int):
+
+    # Dictionary of existing bmi_status_id
     status_map = {
         1: "abaixo do peso",
         2: "com o peso normal",

@@ -10,15 +10,18 @@ from app.services.endpoint_limit_service import auth_rate_limiter
 
 router = APIRouter()
 
+# Request variables to SignUp
 class RegisterUser(BaseModel):
     email: str
     full_name: str
     password: str
 
+# Request variables to Login
 class UserLogin(BaseModel):
     email: str
     password: str
 
+# Response from Login
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
@@ -29,7 +32,7 @@ class TokenResponse(BaseModel):
 #     users = db.query(User).all()
 #     return users
 
-# Creating a new user and saving to the DB
+# Creating a new user and saving into DB
 @router.post("/register", dependencies=[Depends(auth_rate_limiter)])
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()

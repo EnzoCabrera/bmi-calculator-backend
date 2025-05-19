@@ -11,9 +11,11 @@ from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_
 
 router = APIRouter()
 
+# Request variable to create a workout
 class TrainingCreate(BaseModel):
     free_time: int
 
+# Response from creating a workout
 class TrainingResponse(BaseModel):
     id: int
     user_id: int

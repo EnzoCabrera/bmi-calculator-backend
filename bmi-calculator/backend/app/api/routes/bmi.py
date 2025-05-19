@@ -10,6 +10,7 @@ from datetime import datetime
 
 router = APIRouter()
 
+# Request variables to calculate BMI
 class CalculateBMI(BaseModel):
     weight: float
     height: float

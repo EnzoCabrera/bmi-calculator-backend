@@ -8,8 +8,10 @@ from app.db.models import Diet
 
 router = APIRouter()
 
-
+# Method to create the diet
 def calculate_diet(db: Session, user_bmi, bmi_status_id: int, user_id: int, diet: Diet, intolerances: List[str]):
+
+    # Dictionary of existing bmi_status_id
     status_map = {
         1: "abaixo do peso",
         2: "com o peso normal",
