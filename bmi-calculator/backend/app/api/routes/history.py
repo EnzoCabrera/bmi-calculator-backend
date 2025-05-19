@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import User, UserBMI
+from app.services.endpoint_limit_service import get_rate_limiter
 
 router = APIRouter()
 
@@ -15,7 +16,7 @@ class UserBMIHIstory(BaseModel):
     class Config:
         orm_mode = True
 
-@router.get("/latest-by-id", response_model=UserBMIHIstory)
+@router.get("/latest-by-id", response_model=UserBMIHIstory, dependencies=[Depends(get_rate_limiter)])
 def history_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_bmi = (db.query(UserBMI).filter(UserBMI.user_id == user.id).order_by(UserBMI.id.desc()).first())
 
