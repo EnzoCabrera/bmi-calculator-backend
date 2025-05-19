@@ -8,7 +8,8 @@ from app.services.endpoint_limit_service import get_rate_limiter
 
 router = APIRouter()
 
-class UserBMIHIstory(BaseModel):
+# Requested variables to GET the history
+class UserBMIHistory(BaseModel):
     user_id: int
     weight: float
     bmi_value: float
@@ -16,7 +17,8 @@ class UserBMIHIstory(BaseModel):
     class Config:
         orm_mode = True
 
-@router.get("/latest-by-id", response_model=UserBMIHIstory, dependencies=[Depends(get_rate_limiter)])
+# Method to get the latest BMI from user
+@router.get("/latest-by-id", response_model=UserBMIHistory, dependencies=[Depends(get_rate_limiter)])
 def history_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_bmi = (db.query(UserBMI).filter(UserBMI.user_id == user.id).order_by(UserBMI.id.desc()).first())
 

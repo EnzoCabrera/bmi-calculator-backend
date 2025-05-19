@@ -11,9 +11,11 @@ from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_
 
 router = APIRouter()
 
+# Request variable to create a diet
 class DietCreate(BaseModel):
     intolerances: List[str]
 
+# Response from creating a diet
 class DietResponse(BaseModel):
     id: int
     user_id: int
