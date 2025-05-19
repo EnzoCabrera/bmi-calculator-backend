@@ -9,3 +9,4 @@ passlib
 python-multipart
 fastapi-cors
 openai
+redis
