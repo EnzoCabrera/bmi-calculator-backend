@@ -7,7 +7,7 @@ from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import Diet, User, UserBMI
 from app.services.diets_service import calculate_diet
-from app.services.endpoint_limit_service import check_endpoint_limit
+from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter
 
 router = APIRouter()
 
@@ -25,7 +25,7 @@ class DietResponse(BaseModel):
 
 
 # Creating a new diet and saving it to the DB
-@router.post("/create", response_model=DietResponse)
+@router.post("/create", response_model=DietResponse, dependencies=([Depends(post_rate_limiter)]))
 def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
     user_bmi = db.query(UserBMI).filter(User.id == user.id).first()
 
@@ -49,7 +49,7 @@ def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = De
         raise HTTPException(status_code=400, detail=str(e))
 
 # Getting the user's diet by their ID
-@router.get("/by-id")
+@router.get("/by-id", dependencies=[Depends(get_rate_limiter)])
 def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_diet: UserBMI = (
         db.query(UserBMI)

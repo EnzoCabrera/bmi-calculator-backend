@@ -7,7 +7,7 @@ from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import Training, User, UserBMI
 from app.services.training_service import calculate_training
-from app.services.endpoint_limit_service import check_endpoint_limit
+from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter
 
 router = APIRouter()
 
@@ -26,7 +26,7 @@ class TrainingResponse(BaseModel):
 
 
 # Creating a new training and saving it to the DB
-@router.post("/create", response_model=TrainingResponse)
+@router.post("/create", response_model=TrainingResponse, dependencies=[Depends(post_rate_limiter)])
 def create_training(training: TrainingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
@@ -48,7 +48,7 @@ def create_training(training: TrainingCreate, db: Session = Depends(get_db), use
 
 
 # Getting the user's training by their ID
-@router.get("/by-id")
+@router.get("/by-id", dependencies=[Depends(get_rate_limiter)])
 def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_training: UserBMI = (
         db.query(UserBMI)
