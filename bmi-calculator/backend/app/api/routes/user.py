@@ -6,7 +6,7 @@ from app.api.auth import hash_password, verify_password, create_access_token, ge
 from app.api.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.db.session import get_db
 from app.db.models import User
-from app.services.endpoint_limit_service import get_rate_limiter, post_rate_limiter
+from app.services.endpoint_limit_service import auth_rate_limiter
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ class TokenResponse(BaseModel):
 #     return users
 
 # Creating a new user and saving to the DB
-@router.post("/register", dependencies=[Depends(post_rate_limiter)])
+@router.post("/register", dependencies=[Depends(auth_rate_limiter)])
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
@@ -47,7 +47,7 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     return {"message": "User created successfully"}
 
 # Creating a JWT token if the inputted email and password are found in the DB
-@router.post("/login", response_model=TokenResponse, dependencies=[Depends(post_rate_limiter)])
+@router.post("/login", response_model=TokenResponse, dependencies=[Depends(auth_rate_limiter)])
 def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password_hash):

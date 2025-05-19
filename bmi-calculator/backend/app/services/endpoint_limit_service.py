@@ -65,6 +65,29 @@ def post_rate_limiter(user: User = Depends(get_current_user)):
         redis_client.set(key, 1, ex=POST_BLOCK_SECONDS)
 
 
+AUTH_MAX_ATTEMPTS = 3
+AUTH_BLOCK_SECONDS = 30
+
+def auth_client_ip(request: Request) -> str:
+    return request.client.host
+
+def auth_rate_limiter(request: Request):
+    client_ip = auth_client_ip(request)
+    key = f"rate_limit:ip:{client_ip}"
+
+    attempts = redis_client.get(key)
+    if attempts:
+        attempts = int(attempts)
+
+        if attempts >= AUTH_MAX_ATTEMPTS:
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f"Você excedeu o número de tentativas. Tente novamente em {BLOCK_SECONDS} segundos.")
+
+        redis_client.incr(key)
+
+    else:
+        redis_client.set(key, 1, ex=AUTH_BLOCK_SECONDS)
+
+
 # Endpoint limiter for diets and trainings creation
 def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     if user.role == 1:
