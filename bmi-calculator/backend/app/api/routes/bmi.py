@@ -16,7 +16,7 @@ class CalculateBMI(BaseModel):
     height: float
 
 # Calculating the user's BMI and saving it to the DB
-@router.put("/create", dependencies=[Depends(post_rate_limiter)])
+@router.post("/create", dependencies=[Depends(post_rate_limiter)])
 def create_bmi(data: CalculateBMI, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_bmi_limit)):
     if data.height <= 0:
         raise HTTPException(status_code=400, detail="Height must be greater than zero")
@@ -24,13 +24,14 @@ def create_bmi(data: CalculateBMI, db: Session = Depends(get_db), user: User = D
         raise HTTPException(status_code=400, detail="Weight must be greater than zero")
 
     try:
-        user_bmi = calculate_bmi(db, user_id=user.id, weight=data.weight, height=data.height)
-        return {
-            "bmi": user_bmi.bmi_value,
-            "bmi_status_id": user_bmi.bmi_status_id,
-            "created_at": datetime.utcnow(),
-        }
-    except ValueError as e:
+        result = calculate_bmi(
+            db=db,
+            user_id=user.id,
+            weight=data.weight,
+            height=data.height,
+        )
+        return result
+    except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
 
