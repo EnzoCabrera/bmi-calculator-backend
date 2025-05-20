@@ -6,7 +6,7 @@ from app.db.session import get_db
 from app.db.models import User, UserBMI
 from app.services.endpoint_limit_service import get_rate_limiter
 
-router = APIRouter()
+router = APIRouter(tags=["History"])
 
 # Requested variables to GET the history
 class UserBMIHistory(BaseModel):
@@ -15,7 +15,7 @@ class UserBMIHistory(BaseModel):
     bmi_value: float
 
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Method to get the latest BMI from user
 @router.get("/latest-by-id", response_model=UserBMIHistory, dependencies=[Depends(get_rate_limiter)])

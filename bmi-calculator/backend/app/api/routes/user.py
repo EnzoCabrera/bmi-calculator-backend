@@ -8,7 +8,7 @@ from app.db.session import get_db
 from app.db.models import User
 from app.services.endpoint_limit_service import auth_rate_limiter
 
-router = APIRouter()
+router = APIRouter(tags=["Auth"])
 
 # Request variables to SignUp
 class RegisterUser(BaseModel):
