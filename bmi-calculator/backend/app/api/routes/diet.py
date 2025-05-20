@@ -9,7 +9,7 @@ from app.db.models import Diet, User, UserBMI
 from app.services.diets_service import calculate_diet
 from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter
 
-router = APIRouter()
+router = APIRouter(tags=["Diet"])
 
 # Request variable to create a diet
 class DietCreate(BaseModel):

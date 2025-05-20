@@ -8,7 +8,7 @@ from app.db.models import User, UserBMI
 from app.services.endpoint_limit_service import check_bmi_limit, get_rate_limiter, post_rate_limiter
 from datetime import datetime
 
-router = APIRouter()
+router = APIRouter(tags=["Bmi"])
 
 # Request variables to calculate BMI
 class CalculateBMI(BaseModel):

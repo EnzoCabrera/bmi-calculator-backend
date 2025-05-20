@@ -8,7 +8,7 @@ from app.db.models import Training, User, UserBMI
 from app.services.training_service import calculate_training, parse_training_description
 from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter
 
-router = APIRouter()
+router = APIRouter(tags=["Training"])
 
 
 # Response from creating a workout
