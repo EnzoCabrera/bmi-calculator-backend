@@ -1,15 +1,15 @@
 from datetime import datetime
-
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 from app.utils.openai_configs_trainings import generate_training_with_openai
 from app.db.models import Training
+import re
 
 router = APIRouter()
 
 
 # Method to create the training
-def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, training:Training, free_time: int):
+def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, training:Training):
 
     # Dictionary of existing bmi_status_id
     status_map = {
@@ -19,30 +19,31 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
         4: "obesa"
     }
 
-    if free_time == 0:
-        raise ValueError("Você tem que ter um tempo livre para fazer os exercícios")
-    elif free_time > 3:
-        raise ValueError("Um usuário só pode possuir 3 horas livres por dia.")
 
     status_text = status_map.get(user_bmi.bmi_status_id, "com status de IMC desconhecido")
+
     prompt = (
-        f"Crie um treino simples para uma pessoa {status_text} com {free_time} hora{'s' if free_time > 1 else ''} livre por dia. "
-        f"Independentemente da quantidade de horas livres do usuário. Crie um treino para cada dia da semana."
-        f"Os treinos devem ser desse modo: Segunda: exercicio: 4x15; exercicio: 4x12; exercicio: 3x45s; exercicio: 4x10; Terça: exercicio: 4x15; exercicio: 4x12; exercicio: 3x10; exercicio: 4x10; Quarta: exercicio: 4x15; exercicio: 4x12; exercicio: 3x45s; exercicio: 4x10; Quinta: exercicio: 4x15; exercicio: 4x12; exercicio: 3x10; exercicio: 4x10; Sexta: exercicio: 4x15; exercicio: 4x12; exercicio: 3x45s; exercicio: 4x10. Isso é apenas um exemplo a ser seguido, crie os treinos com exercícios reais."
-        f"SEMPRE utilize exercícios diversos."
-        f"NÃO utilize quebra de linha para dividir os dias da semana, apenas ponto e vírgula."
-        f"Retorne apenas os dias da semana, os exercícios e suas repetições separados por ponto e vírgula, sem explicações ou introduções."
-        f"NÃO utilize quebras de linha, apenas ponto e vírgula. Exemplo de formato: 'Agachamento: 3x15; Flexão: 3x12; Prancha: 3x30s'"
-        f"Quando o usuário tiver apenas 1 hora livre por dia, ofereça no máximo 4 exercicios diferentes. Se o usuário tiver 2 horas livres por dia, ofereça 7 exercicios diferentes. Se o usuário tiver 3 horas livres por dia, ofereça 9 exercicios diferentes"
-    )
+        f"Crie um treino simples para uma pessoa {status_text}. "
+        f"NÃO utilize quebras de linha (\n) em nenhuma parte da resposta. "
+        f"Toda a resposta deve estar em UMA ÚNICA LINHA. "
+        f"Use APENAS ponto e vírgula (;) para separar os exercícios. "
+        f"Crie um treino para cada dia da semana (Segunda a Sexta), com exatamente 5 exercícios por dia. "
+        f"Use sempre este formato exato, sem variações: "
+        f"Dia: Nome do Exercício: Repetições; Nome do Exercício: Repetições; Nome do Exercício: Repetições; Nome do Exercício: Repetições; Nome do Exercício: Repetições; "
+        f"Exemplo: Segunda: Agachamento: 4x15; Flexão de Braço: 4x12; Prancha Ventral: 3x45s; Abdominal: 4x20; Polichinelo: 4x30s; Terça: ... "
+        f"IMPORTANTE: Não escreva explicações, títulos ou quebras de linha. Apenas a sequência no formato especificado, todos os dias seguidos em uma única linha. "
+        f"Sempre utilize exercícios variados e realistas."
+       )
 
 
     training_text = generate_training_with_openai(prompt)
 
+    parsed_training = parse_training_description(training_text)
+    print(parsed_training)
+
     training.description = training_text
     training.user_id = user_id
     training.bmi_status_id = bmi_status_id
-    training.free_time = free_time
     training.created_at = datetime.utcnow()
 
     db.add(training)
@@ -50,5 +51,28 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
     db.refresh(training)
 
     return training
+
+
+def parse_training_description(description: str) -> dict:
+    days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
+    result = {}
+
+    for day in days:
+        standard = rf"{day}:(.*?)(?=(Segunda|Terça|Quarta|Quinta|Sexta|$))"
+        match = re.search(standard, description)
+        if match:
+            exercicios_raw = match.group(1).strip().split(";")
+            exercicios = []
+            for item in exercicios_raw:
+                portion = item.strip().split(":")
+                if len(portion) == 2:
+                    exercicios.append({
+                        "exercicio": portion[0].strip(),
+                        "repeticoes": portion[1].strip()
+                    })
+            result[day] = exercicios
+
+    return result
+
 
 
