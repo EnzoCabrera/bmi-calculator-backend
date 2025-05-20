@@ -1,25 +1,23 @@
 from datetime import datetime
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import Training, User, UserBMI
-from app.services.training_service import calculate_training
+from app.services.training_service import calculate_training, parse_training_description
 from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter
 
 router = APIRouter()
 
-class TrainingCreate(BaseModel):
-    free_time: int
 
+# Response from creating a workout
 class TrainingResponse(BaseModel):
     id: int
     user_id: int
     bmi_status_id: int
-    free_time: int
     description: str
+    parsed_description: dict
 
     class Config:
         from_attributes = True
@@ -27,7 +25,7 @@ class TrainingResponse(BaseModel):
 
 # Creating a new training and saving it to the DB
 @router.post("/create", response_model=TrainingResponse, dependencies=[Depends(post_rate_limiter)])
-def create_training(training: TrainingCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
+def create_training(db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_endpoint_limit)):
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
     if not user_bmi:
@@ -39,9 +37,9 @@ def create_training(training: TrainingCreate, db: Session = Depends(get_db), use
             bmi_status_id=user_bmi.bmi_status_id,
             user_id=user.id,
             training=Training(),
-            free_time=training.free_time,
         )
 
+        result.parsed_description = parse_training_description(result.description)
         return result
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
