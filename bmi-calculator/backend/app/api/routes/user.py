@@ -25,6 +25,8 @@ class UserLogin(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+    email: str
+    name: str
 
 # Getting all users in the DB
 # @router.get("/")
@@ -50,15 +52,18 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     return {"message": "User created successfully"}
 
 # Creating a JWT token if the inputted email and password are found in the DB
-@router.post("/login", response_model=TokenResponse, dependencies=[Depends(auth_rate_limiter)])
-def login(user: UserLogin, db: Session = Depends(get_db)):
+@router.post("/login", response_model=TokenResponse)
+def login(user: UserLogin, db: Session = Depends(get_db), remaining_attempts: int = Depends(auth_rate_limiter)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password_hash):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid credentials")
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail={
+                "error": "Invalid credentials",
+                "remaining_attempts": remaining_attempts,} )
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
         data={"sub": db_user.email}, expires_delta=access_token_expires)
 
-    return {"access_token": access_token, "token_type": "bearer", "user_id": str(db_user.id)}
+    return {"access_token": access_token, "token_type": "bearer", "email": user.email, "name": db_user.full_name, "user_id": str(db_user.id)}

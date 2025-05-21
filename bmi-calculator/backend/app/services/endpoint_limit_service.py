@@ -88,16 +88,20 @@ def auth_rate_limiter(request: Request):
     key = f"rate_limit:ip:{client_ip}"
 
     attempts = redis_client.get(key)
+
     if attempts:
-        attempts = int(attempts)
+        attempts = int(attempts) + 1
+        redis_client.set(key, attempts, ex=AUTH_BLOCK_SECONDS)
 
         if attempts >= AUTH_MAX_ATTEMPTS:
-            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f"Você excedeu o número de tentativas. Tente novamente em {BLOCK_SECONDS} segundos.")
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f"Você excedeu o número de tentativas. Tente novamente em {AUTH_BLOCK_SECONDS} segundos.")
 
-        redis_client.incr(key)
-
+        remaining_attempts = AUTH_MAX_ATTEMPTS - attempts
     else:
         redis_client.set(key, 1, ex=AUTH_BLOCK_SECONDS)
+        remaining_attempts = AUTH_MAX_ATTEMPTS - 1
+
+    return remaining_attempts
 
 
 # Endpoint limiter for diets and trainings creation, applied for common users
