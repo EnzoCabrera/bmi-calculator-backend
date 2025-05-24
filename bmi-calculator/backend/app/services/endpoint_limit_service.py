@@ -109,9 +109,9 @@ def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get
     if user.role == 1:
         limit = datetime.utcnow() - timedelta(days=90)
 
-        last_request = (db.query(Training).filter(Training.user_id == user.id).filter(Training.created_at >= limit).first())
+        last_request = (db.query(Training).filter(Training.user_id == user.id).order_by(Training.created_at.desc()).first())
 
-        if last_request:
+        if last_request and last_request.created_at >= limit:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, necessário plano plus")
 
 
@@ -120,7 +120,7 @@ def check_bmi_limit(db: Session = Depends(get_db), user: User = Depends(get_curr
     if user.role == 1:
         limit = datetime.utcnow() - timedelta(days=30)
 
-        last_request = (db.query(UserBMI.user_id == user.id).filter(UserBMI.created_at >= limit).first())
+        last_bmi = (db.query(UserBMI).filter(UserBMI.user_id == user.id).order_by(UserBMI.created_at.desc()).first())
 
-        if last_request:
+        if last_bmi and last_bmi.created_at >= limit:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para calcular novamente o IMC, aguarde um mês ou assine o plano plus")
