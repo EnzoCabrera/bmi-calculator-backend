@@ -1,4 +1,5 @@
 from datetime import datetime
+from typing import List, Dict
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
@@ -11,13 +12,17 @@ from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_
 router = APIRouter(tags=["Training"])
 
 
+class TrainingDay(BaseModel):
+    day: str
+    exercises: List[Dict[str, str]]
+
 # Response from creating a workout
 class TrainingResponse(BaseModel):
     id: int
     user_id: int
     bmi_status_id: int
     description: str
-    parsed_description: dict
+    parsed_description: List[TrainingDay]
 
     class Config:
         from_attributes = True
@@ -39,8 +44,16 @@ def create_training(db: Session = Depends(get_db), user: User = Depends(get_curr
             training=Training(),
         )
 
-        result.parsed_description = parse_training_description(result.description)
-        return result
+        parsed = parse_training_description(result.description)
+
+        return {
+            "id": result.id,
+            "user_id": result.user_id,
+            "bmi_status_id": result.bmi_status_id,
+            "description": result.description,
+            "parsed_description": parsed,
+        }
+
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 

@@ -69,24 +69,27 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
     return training
 
 
-def parse_training_description(description: str) -> dict:
+def parse_training_description(description: str):
     days = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"]
-    result = {}
+    result = []
 
     for day in days:
         standard = rf"{day}:(.*?)(?=(Segunda|Terça|Quarta|Quinta|Sexta|$))"
         match = re.search(standard, description)
         if match:
-            exercicios_raw = match.group(1).strip().split(";")
-            exercicios = []
-            for item in exercicios_raw:
+            exercises_raw = match.group(1).strip().split(";")
+            exercises = []
+            for item in exercises_raw:
                 portion = item.strip().split(":")
                 if len(portion) == 2:
-                    exercicios.append({
+                    exercises.append({
                         "exercicio": portion[0].strip(),
                         "repeticoes": portion[1].strip()
                     })
-            result[day] = exercicios
+            result.append({
+                "day": day,
+                "exercises": exercises,
+            })
 
     return result
 
