@@ -121,3 +121,9 @@ def check_bmi_limit(db: Session = Depends(get_db), user: User = Depends(get_curr
 
         if last_bmi and last_bmi.created_at >= limit:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para calcular novamente o IMC, aguarde um mês ou assine o plano plus")
+
+
+def endpoint_admin_limit(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    if not user.role == 3:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Somente usuários ADMIN, podem utilizar esse endpoint.")
+

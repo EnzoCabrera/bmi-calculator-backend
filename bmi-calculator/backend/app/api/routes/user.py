@@ -6,7 +6,7 @@ from app.api.auth import hash_password, verify_password, create_access_token, ge
 from app.api.config import ACCESS_TOKEN_EXPIRE_MINUTES
 from app.db.session import get_db
 from app.db.models import User
-from app.services.endpoint_limit_service import auth_rate_limiter
+from app.services.endpoint_limit_service import auth_rate_limiter, endpoint_admin_limit
 
 router = APIRouter(tags=["Auth"])
 
@@ -28,11 +28,7 @@ class TokenResponse(BaseModel):
     email: str
     name: str
 
-# Getting all users in the DB
-# @router.get("/")
-# def get_users(db: Session = Depends(get_db)):
-#     users = db.query(User).all()
-#     return users
+
 
 # Creating a new user and saving into DB
 @router.post("/register", dependencies=[Depends(auth_rate_limiter)])
@@ -68,3 +64,10 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         data={"sub": db_user.email}, expires_delta=access_token_expires)
 
     return {"access_token": access_token, "token_type": "bearer", "email": user.email, "name": db_user.full_name, "user_id": str(db_user.id)}
+
+
+# Getting all users in the DB
+@router.get("/get-all")
+def get_users(db: Session = Depends(get_db), _: None = Depends(endpoint_admin_limit)):
+    users = db.query(User).all()
+    return users
