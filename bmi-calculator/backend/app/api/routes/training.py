@@ -34,7 +34,7 @@ def create_training(db: Session = Depends(get_db), user: User = Depends(get_curr
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
     if not user_bmi:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IMC do usuário não encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IMC do usuário não encontrado.")
     try:
         result = calculate_training(
             db=db,
@@ -70,7 +70,7 @@ def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_curr
 
     if not user_training:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado.")
 
     training: Training = (
         db.query(Training)

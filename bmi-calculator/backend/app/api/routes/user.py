@@ -39,7 +39,7 @@ class TokenResponse(BaseModel):
 def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     existing_user = db.query(User).filter(User.email == user.email).first()
     if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Esse email já foi utilizado para cadastro")
 
     hashed_password = hash_password(user.password)
 
@@ -49,7 +49,7 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_user)
 
-    return {"message": "User created successfully"}
+    return {"message": "Usuário criado com sucesso!"}
 
 # Creating a JWT token if the inputted email and password are found in the DB
 @router.post("/login", response_model=TokenResponse)
@@ -59,7 +59,7 @@ def login(user: UserLogin, db: Session = Depends(get_db)):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
-                "error": "Invalid credentials",
+                "error": "Email ou senha incorretos. Tente novamente",
             }
         )
 

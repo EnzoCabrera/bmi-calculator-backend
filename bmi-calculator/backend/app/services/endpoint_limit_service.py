@@ -109,7 +109,7 @@ def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get
         last_request = (db.query(Training).filter(Training.user_id == user.id).order_by(Training.created_at.desc()).first())
 
         if last_request and last_request.created_at >= limit:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, necessário plano plus")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, aguarde três meses ou assine o plano plus necessário plano plus")
 
 
 # Endpoint limiter for BMI calculation, applied for common users
