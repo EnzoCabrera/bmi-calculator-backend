@@ -59,7 +59,7 @@ def create_training(db: Session = Depends(get_db), user: User = Depends(get_curr
 
 
 # Getting the user's training by their ID
-@router.get("/by-id", dependencies=[Depends(get_rate_limiter)])
+@router.get("/by-id", response_model=TrainingResponse, dependencies=[Depends(get_rate_limiter)])
 def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_training: UserBMI = (
         db.query(UserBMI)
@@ -78,7 +78,16 @@ def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_curr
         .order_by(Training.id.desc())
         .first()
     )
-    return training
+
+    parsed = parse_training_description(training.description)
+
+    return {
+        "id": training.id,
+        "user_id": training.user_id,
+        "bmi_status_id": training.bmi_status_id,
+        "description": training.description,
+        "parsed_description": parsed
+    }
 
 
 # Getting all trainings in the DB
