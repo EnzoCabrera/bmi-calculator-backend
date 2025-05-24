@@ -28,8 +28,3 @@ app.include_router(diet.router, prefix="/api/diets")
 app.include_router(training.router, prefix="/api/trainings")
 app.include_router(history.router, prefix="/api/history")
 
-
-# Teste
-@app.get("/")
-def read_root():
-    return {"message": "FastAPI running inside Docker!"}

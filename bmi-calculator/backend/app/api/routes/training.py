@@ -7,7 +7,7 @@ from app.api.auth import get_current_user
 from app.db.session import get_db
 from app.db.models import Training, User, UserBMI
 from app.services.training_service import calculate_training, parse_training_description
-from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter
+from app.services.endpoint_limit_service import check_endpoint_limit, post_rate_limiter, get_rate_limiter, endpoint_admin_limit
 
 router = APIRouter(tags=["Training"])
 
@@ -90,11 +90,11 @@ def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_curr
     }
 
 
-# Getting all trainings in the DB
-# @router.get("/get-all")
-# def get_trainings(db: Session = Depends(get_db)):
-#     trainings = db.query(Training).all()
-#     return trainings
+#Getting all trainings in the DB
+@router.get("/get-all")
+def get_trainings(db: Session = Depends(get_db), _: None = Depends(endpoint_admin_limit)):
+    trainings = db.query(Training).all()
+    return trainings
 
 
 
