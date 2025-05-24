@@ -23,6 +23,6 @@ def history_by_id(db: Session = Depends(get_db), user: User = Depends(get_curren
     user_bmi = (db.query(UserBMI).filter(UserBMI.user_id == user.id).order_by(UserBMI.id.desc()).first())
 
     if not user_bmi:
-        raise HTTPException(status_code=404, detail="History not found")
+        raise HTTPException(status_code=404, detail="Histórico não encontrado.")
 
     return user_bmi
