@@ -53,14 +53,15 @@ def register_user(user: RegisterUser, db: Session = Depends(get_db)):
 
 # Creating a JWT token if the inputted email and password are found in the DB
 @router.post("/login", response_model=TokenResponse)
-def login(user: UserLogin, db: Session = Depends(get_db), remaining_attempts: int = Depends(auth_rate_limiter)):
+def login(user: UserLogin, db: Session = Depends(get_db)):
     db_user = db.query(User).filter(User.email == user.email).first()
     if not db_user or not verify_password(user.password, db_user.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail={
                 "error": "Invalid credentials",
-                "remaining_attempts": remaining_attempts,} )
+            }
+        )
 
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
