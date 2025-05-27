@@ -25,8 +25,13 @@ def calculate_diet(db: Session, user_bmi, bmi_status_id: int, user_id: int, diet
     status_text = status_map.get(user_bmi.bmi_status_id, "com status de IMC desconhecido")
     prompt = (
         f"Crie uma dieta semanal completa para uma pessoa {status_text}. "
-        f"Não utilize NENHUM prato que contenha ingredientes aos quais o usuário tem alergia ou intolerância: {intolerances}. "
-        f"Todos os pratos listados abaixo já são seguros, portanto podem ser utilizados sem modificações. "
+        f"A pessoa possui as seguintes intolerâncias alimentares: {intolerances}. "
+        f"Portanto, é PROIBIDO incluir quaisquer ingredientes associados a essas intolerâncias. "
+        f"Se a intolerância for à lactose, evite ingredientes como: leite, queijo, manteiga, creme de leite, iogurte tradicional. "
+        f"Se a intolerância for ao glúten, evite: trigo, cevada, centeio, aveia não certificada, pão comum, bolo comum, torradas, cookies. "
+        f"Se a intolerância for à frutose, evite: banana, maçã, pera, uva, manga, melancia, tâmara, mel, alimentos ultraprocessados com açúcar concentrado ou frutas doces em excesso. "
+        f"Utilize apenas os pratos listados abaixo, mas SOMENTE os que forem compatíveis com as intolerâncias informadas. "
+        f"NÃO utilize pratos com ingredientes proibidos, mesmo que estejam na lista abaixo. Ignore-os completamente. "
         f"A dieta deve conter EXATAMENTE 7 dias: Segunda, Terça, Quarta, Quinta, Sexta, Sábado e Domingo. "
         f"Cada dia deve conter EXATAMENTE 4 refeições: Café da Manhã, Almoço, Café da Tarde e Jantar — NESSA ORDEM. "
         f"Cada refeição deve conter EXATAMENTE 1 prato, com: "
@@ -47,11 +52,15 @@ def calculate_diet(db: Session, user_bmi, bmi_status_id: int, user_id: int, diet
         f"Café da Tarde: Prato: [nome]; Ingredientes: [quantidades]; "
         f"Jantar: Prato: [nome]; Ingredientes: [quantidades];\n"
         f"Use os nomes dos dias da semana exatamente assim: Segunda, Terça, Quarta, Quinta, Sexta, Sábado, Domingo — SEM '-feira'. "
-        f"Utilize apenas os pratos abaixo, sem alterar nomes nem ingredientes:\n"
-        f"Café da Manhã: Omelete com espinafre e tomate, Tapioca com ovo mexido, Pão integral com pasta de abacate, Panqueca de banana e aveia, Pão de queijo fit com batata-doce, Mingau de aveia com banana e chia, Tapioca com pasta de grão-de-bico (homus), Smoothie de frutas com linhaça, Pão integral com pasta de amendoim e banana, Crepioca com espinafre.\n"
-        f"Almoço: Peito de frango grelhado com arroz integral e brócolis, Tilápia grelhada com batata-doce e salada, Quinoa com frango desfiado e legumes, Estrogonofe de frango leve com arroz e salada, Arroz com lentilha e legumes salteados, Escondidinho de batata-doce com carne moída, Abobrinha recheada com arroz e legumes, Polenta cremosa com legumes refogados, Frango desfiado com purê de mandioquinha e couve refogada, Carne bovina grelhada com arroz integral e vagem.\n"
-        f"Café da Tarde: Frutas picadas com granola sem açúcar, Pão integral com ovo cozido e tomate, Iogurte vegetal com morangos e linhaça, Tâmara com castanha ou pasta de amendoim, Bolo de banana com aveia (vegano), Cookies de aveia e uva-passa, Pão integral com homus e cenoura ralada, Mix de castanhas com frutas secas, Torrada integral com guacamole.\n"
-        f"Jantar: Sopa de abóbora com gengibre, Omelete de legumes com arroz integral, Legumes assados no forno com frango desfiado, Salada morna de batata-doce, grão-de-bico e couve, Sopa de lentilha com legumes, Arroz integral com tofu grelhado e couve refogada, Panqueca de aveia com recheio de legumes, Purê de inhame com cogumelos salteados, Tabule com grão-de-bico e hortelã."
+        f"Utilize apenas os pratos abaixo, e apenas os que não contêm ingredientes associados às intolerâncias da pessoa:\n"
+        f"Café da Manhã: Omelete com espinafre e tomate, Tapioca com ovo mexido, Pão integral com pasta de abacate, Panqueca de banana e aveia, Pão de queijo fit com batata-doce, Mingau de aveia com banana e chia, Tapioca com pasta de grão-de-bico (homus), Smoothie de frutas com linhaça, Pão integral com pasta de amendoim e banana, Crepioca com espinafre, "
+        f"Ovos mexidos com batata-doce cozida, Panqueca de aveia com chia, Omelete de tofu com espinafre, Polenta cremosa com linhaça.\n"
+        f"Almoço: Peito de frango grelhado com arroz integral e brócolis, Tilápia grelhada com batata-doce e salada, Quinoa com frango desfiado e legumes, Estrogonofe de frango leve com arroz e salada, Arroz com lentilha e legumes salteados, Escondidinho de batata-doce com carne moída, Abobrinha recheada com arroz e legumes, Polenta cremosa com legumes refogados, Frango desfiado com purê de mandioquinha e couve refogada, Carne bovina grelhada com arroz integral e vagem, "
+        f"Panqueca de grão-de-bico com vegetais, Quibe assado de abóbora e quinoa, Arroz integral com peito de frango e vagem, Purê de inhame com carne grelhada.\n"
+        f"Café da Tarde: Frutas picadas com granola sem açúcar, Pão integral com ovo cozido e tomate, Iogurte vegetal com morangos e linhaça, Tâmara com castanha ou pasta de amendoim, Bolo de banana com aveia (vegano), Cookies de aveia e uva-passa, Pão integral com homus e cenoura ralada, Mix de castanhas com frutas secas, Torrada integral com guacamole, "
+        f"Chips de batata-doce com pasta de grão-de-bico, Iogurte vegetal com chia, Biscoitos de polvilho sem glúten, Ovos cozidos com azeite e orégano.\n"
+        f"Jantar: Sopa de abóbora com gengibre, Omelete de legumes com arroz integral, Legumes assados no forno com frango desfiado, Salada morna de batata-doce, grão-de-bico e couve, Sopa de lentilha com legumes, Arroz integral com tofu grelhado e couve refogada, Panqueca de aveia com recheio de legumes, Purê de inhame com cogumelos salteados, Tabule com grão-de-bico e hortelã, "
+        f"Caldo de mandioca com carne desfiada, Omelete de cogumelos com espinafre, Legumes cozidos com arroz integral, Purê de batata-doce com frango desfiado.\n"
     )
 
     diet_text = generate_diets_with_openai(prompt).replace('\n', ' ').replace('\r', '')
