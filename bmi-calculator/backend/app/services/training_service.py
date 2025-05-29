@@ -22,7 +22,6 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
 
     status_text = status_map.get(user_bmi.bmi_status_id, "com status de IMC desconhecido")
 
-
     prompt = (
         f"Crie um treino simples para uma pessoa {status_text}. "
         f"NÃO utilize quebras de linha (\\n) em nenhuma parte da resposta. "
@@ -32,24 +31,25 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
         f"Cada dia da semana deve focar em um grupo muscular específico, da seguinte forma: "
         f"Segunda: Peito; Terça: Costas; Quarta: Perna; Quinta: Ombro; Sexta: Braço. "
         f"Para montar os treinos, escolha aleatoriamente 5 exercícios de cada grupo muscular da lista abaixo. "
+        f"IMPORTANTE: Use apenas os exercícios listados abaixo, sem criar variações, nomes diferentes ou sinônimos. "
+        f"Você DEVE usar exatamente o mesmo nome do exercício conforme listado, com a mesma ortografia e pontuação. "
+        f"NÃO invente exercícios, NÃO altere nomes e NÃO use traduções. Somente os nomes exatos da lista. "
         f"Use sempre este formato exato, sem variações: "
         f"Dia: Nome do Exercício: Repetições; Nome do Exercício: Repetições; Nome do Exercício: Repetições; Nome do Exercício: Repetições; Nome do Exercício: Repetições; "
-        f"As repetições devem seguir o seguinte formato: repetiçõesxséries, deste modo: 4x15, isso é apenas um exemplo, utilize repetições variadas."
+        f"As repetições devem seguir o seguinte formato: repetiçõesxséries, como por exemplo: 4x15, 3x12, etc. "
         f"NÃO escreva explicações, títulos ou quebras de linha. Apenas a sequência no formato especificado, todos os dias seguidos em uma única linha. "
-        f"NÃO invente novos exercícios — use somente os listados. "        
-        f"Lista de exercícios válidos por grupo muscular (utilize apenas esses): "
-        
-        f"Peito: Supino Reto, Supino Inclinado com Halteres, Crucifixo Reto, Flexão de Braço, Pullover com Halteres, Crossover no Cabo, Supino Declinado, Flexão com Batida de Mão. "
-        
-        f"Costas: Puxada na Frente, Remada Unilateral com Halteres, Barra Fixa, Puxada na Frente com Pegada Fechada, Remada Curvada com Barra, Remada Cavalinho, Levantamento Terra, Puxada na Frente com Pegada Supinada. "
-        
-        f"Perna: Agachamento Livre, Leg Press 45°, Cadeira Extensora, Cadeira Flexora, Avanço com Halteres, Stiff com Halteres, Afundo no Banco, Agachamento Sumô com Halteres. "
-        
-        f"Ombro: Desenvolvimento com Halteres, Elevação Lateral, Elevação Frontal, Arnold Press, Encolhimento com Halteres, Crucifixo Invertido no Peck Deck, Remada Alta com Barra, Elevação Lateral com Halteres Sentado. "
-        
-        f"Braço: Rosca Direta com Barra, Rosca Alternada com Halteres, Tríceps Pulley, Tríceps Testa com Barra, Rosca Martelo, Tríceps Coice com Halteres, Rosca Concentrada, Tríceps Banco. "
+        f"Lista de exercícios válidos por grupo muscular (utilize apenas esses, sem mudar os nomes): "
 
-       )
+        f"Peito: Supino Reto, Supino Inclinado com Halteres, Crucifixo Reto, Flexão de Braço, Pullover com Halteres, Crossover no Cabo, Supino Declinado, Flexão com Batida de Mão. "
+
+        f"Costas: Puxada na Frente, Remada Unilateral com Halteres, Barra Fixa, Puxada na Frente com Pegada Fechada, Remada Curvada com Barra, Remada Cavalinho, Levantamento Terra, Puxada na Frente com Pegada Supinada. "
+
+        f"Perna: Agachamento Livre, Leg Press 45°, Cadeira Extensora, Cadeira Flexora, Avanço com Halteres, Stiff com Halteres, Afundo no Banco, Agachamento Sumô com Halteres. "
+
+        f"Ombro: Desenvolvimento com Halteres, Elevação Lateral, Elevação Frontal, Arnold Press, Encolhimento com Halteres, Crucifixo Invertido no Peck Deck, Remada Alta com Barra, Elevação Lateral com Halteres Sentado. "
+
+        f"Braço: Rosca Direta com Barra, Rosca Alternada com Halteres, Tríceps Pulley, Tríceps Testa com Barra, Rosca Martelo, Tríceps Coice com Halteres, Rosca Concentrada, Tríceps Banco. "
+    )
 
 
     training_text = generate_training_with_openai(prompt)
