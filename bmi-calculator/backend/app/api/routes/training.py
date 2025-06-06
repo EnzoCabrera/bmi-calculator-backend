@@ -63,7 +63,7 @@ def create_training(db: Session = Depends(get_db), user: User = Depends(get_curr
 def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_training: UserBMI = (
         db.query(UserBMI)
-        .filter(User.id == user.id)
+        .filter(UserBMI.user_id == user.id)
         .order_by(UserBMI.created_at.desc())
         .first()
     )
