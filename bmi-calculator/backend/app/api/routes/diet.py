@@ -41,7 +41,7 @@ def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = De
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
     if not user_bmi:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IMC do usuário não encontrado")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Não foi possível encontrar seu IMC. Cadastre suas informações primeiro.')
 
     existing_diet = db.query(Diet).filter(Diet.user_id == user.id).first()
 
@@ -79,7 +79,7 @@ def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_
 
     if not user_diet:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+            status_code=status.HTTP_404_NOT_FOUND, detail='Não foi possível encontrar seu IMC. Cadastre suas informações primeiro.')
 
     diet: Diet = (
         db.query(Diet)
@@ -89,7 +89,7 @@ def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_
     )
 
     if not user_diet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Você ainda não possui dietas")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Você ainda não criou nenhuma dieta.')
 
     parsed = parse_diet_description(diet.description)
 
