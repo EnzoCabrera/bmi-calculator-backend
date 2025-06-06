@@ -5,9 +5,9 @@ from app.db.models import UserBMI
 def calculate_bmi(db: Session, user_id: int, weight: float, height: float):
 
     if height <= 0:
-        raise ValueError("Altura deve ser maior que zero.")
+        raise ValueError('Informe uma altura válida (maior que zero).')
     if weight <= 0:
-        raise ValueError("Peso deve ser maior que zero.")
+        raise ValueError('Informe um peso válido (maior que zero).')
 
     if height > 2.72:
         height /= 100

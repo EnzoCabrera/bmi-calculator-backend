@@ -42,7 +42,7 @@ def get_rate_limiter(user: User = Depends(get_current_user)):
         attempts = int(attempts)
 
         if attempts >= GET_MAX_ATTEMPTS:
-            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f"Você excedeu o número de tentativas. Tente novamente em {GET_BLOCK_SECONDS} segundos.")
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f'Muitas tentativas. Tente novamente em {GET_BLOCK_SECONDS} segundos.')
 
         redis_client.incr(key)
 
@@ -65,7 +65,7 @@ def post_rate_limiter(user: User = Depends(get_current_user)):
         attempts = int(attempts)
 
         if attempts >= POST_MAX_ATTEMPTS:
-            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f"Você excedeu o número de tentativas. Tente novamente em {POST_BLOCK_SECONDS} segundos.")
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f'Muitas tentativas. Tente novamente em {POST_BLOCK_SECONDS} segundos.')
 
         redis_client.incr(key)
 
@@ -94,7 +94,7 @@ def auth_rate_limiter(request: Request):
         redis_client.set(key, attempts, ex=AUTH_BLOCK_SECONDS)
 
         if attempts >= AUTH_MAX_ATTEMPTS:
-            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f"Você excedeu o número de tentativas. Tente novamente em {AUTH_BLOCK_SECONDS} segundos.")
+            raise HTTPException(status_code=status.HTTP_429_TOO_MANY_REQUESTS, detail=f'Muitas tentativas. Tente novamente em {AUTH_BLOCK_SECONDS} segundos.')
 
     else:
         redis_client.set(key, 1, ex=AUTH_BLOCK_SECONDS)
@@ -109,7 +109,7 @@ def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get
         last_request = (db.query(Training).filter(Training.user_id == user.id).order_by(Training.created_at.desc()).first())
 
         if last_request and last_request.created_at >= limit:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, aguarde três meses ou assine o plano plus necessário plano plus")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Para acessar mais treinos e dietas, aguarde 3 meses ou assine o plano Plus.')
 
 
 # Endpoint limiter for diets creation, applied for common users
@@ -120,7 +120,7 @@ def check_endpoint_limit_diets(db: Session = Depends(get_db), user: User = Depen
         last_diet = (db.query(Diet).filter(Diet.user_id == user.id).order_by(Diet.created_at.desc()).first())
 
         if last_diet and last_diet.created_at >= limit:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, aguarde três meses ou assine o plano plus necessário plano plus")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Para gerar novos treinos e dietas, aguarde 3 meses ou assine o plano Plus.')
 
 
 
@@ -132,10 +132,10 @@ def check_bmi_limit(db: Session = Depends(get_db), user: User = Depends(get_curr
         last_bmi = (db.query(UserBMI).filter(UserBMI.user_id == user.id).order_by(UserBMI.created_at.desc()).first())
 
         if last_bmi and last_bmi.created_at >= limit:
-            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para calcular novamente o IMC, aguarde um mês ou assine o plano plus")
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Para recalcular o IMC, aguarde 1 mês ou assine o plano Plus.')
 
 
 def endpoint_admin_limit(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     if not user.role == 3:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Somente usuários ADMIN, podem utilizar esse endpoint.")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail='Este recurso é exclusivo para administradores.')
 

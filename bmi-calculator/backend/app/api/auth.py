@@ -32,7 +32,7 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
 def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid authentication credentials",
+        detail='Suas credenciais estão incorretas',
         headers={"WWW-Authenticate": "Bearer"},
     )
     try:
