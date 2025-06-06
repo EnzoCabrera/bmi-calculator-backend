@@ -43,8 +43,6 @@ def create_diet(diet: DietCreate, db: Session = Depends(get_db), user: User = De
     if not user_bmi:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Não foi possível encontrar seu IMC. Cadastre suas informações primeiro.')
 
-    existing_diet = db.query(Diet).filter(Diet.user_id == user.id).first()
-
     try:
         result = calculate_diet(
             db=db,
@@ -88,7 +86,7 @@ def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_
         .first()
     )
 
-    if not user_diet:
+    if not diet:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Você ainda não criou nenhuma dieta.')
 
     parsed = parse_diet_description(diet.description)
