@@ -3,7 +3,7 @@ from fastapi import FastAPI, Request, HTTPException, status, Depends
 from sqlalchemy.orm import Session
 from app.api.auth import get_current_user
 from app.db.session import get_db
-from app.db.models import Training, User, UserBMI
+from app.db.models import Training, User, UserBMI, Diet
 from redis import Redis
 import redis
 import os
@@ -110,6 +110,18 @@ def check_endpoint_limit(db: Session = Depends(get_db), user: User = Depends(get
 
         if last_request and last_request.created_at >= limit:
             raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, aguarde três meses ou assine o plano plus necessário plano plus")
+
+
+# Endpoint limiter for diets creation, applied for common users
+def check_endpoint_limit_diets(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    if user.role == 1:
+        limit = datetime.utcnow() - timedelta(days=90)
+
+        last_diet = (db.query(Diet).filter(Diet.user_id == user.id).order_by(Diet.created_at.desc()).first())
+
+        if last_diet and last_diet.created_at >= limit:
+            raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Para mais treinos e dietas, aguarde três meses ou assine o plano plus necessário plano plus")
+
 
 
 # Endpoint limiter for BMI calculation, applied for common users
