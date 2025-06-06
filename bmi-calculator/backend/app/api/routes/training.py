@@ -79,6 +79,11 @@ def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_curr
         .first()
     )
 
+    if not training:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Você ainda não possui treinos.")
+
+
+
     parsed = parse_training_description(training.description)
 
     return {

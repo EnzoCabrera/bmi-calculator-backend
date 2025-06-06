@@ -88,6 +88,9 @@ def diets_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_
         .first()
     )
 
+    if not user_diet:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Você ainda não possui dietas")
+
     parsed = parse_diet_description(diet.description)
 
     return {
