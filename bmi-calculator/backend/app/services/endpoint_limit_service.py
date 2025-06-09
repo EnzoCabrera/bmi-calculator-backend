@@ -24,7 +24,7 @@ app = FastAPI()
 
 
 # GET variables
-GET_MAX_ATTEMPTS = 5
+GET_MAX_ATTEMPTS = 50
 GET_BLOCK_SECONDS = 10
 
 # Requesting authentication to request the GET endpoints
@@ -51,7 +51,7 @@ def get_rate_limiter(user: User = Depends(get_current_user)):
 
 
 # POST variables
-POST_MAX_ATTEMPTS = 3
+POST_MAX_ATTEMPTS = 30
 POST_BLOCK_SECONDS = 30
 
 # Attempt limiter for POST endpoints
@@ -74,7 +74,7 @@ def post_rate_limiter(user: User = Depends(get_current_user)):
 
 
 # auth variables
-AUTH_MAX_ATTEMPTS = 3
+AUTH_MAX_ATTEMPTS = 30
 AUTH_BLOCK_SECONDS = 30
 
 
