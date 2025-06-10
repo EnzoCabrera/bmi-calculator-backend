@@ -1,7 +1,7 @@
 from unittest.mock import patch
+from tests.conftest import DummyTexts
 from app.services.diets_service import calculate_diet, sanitize_diet_text, parse_diet_description
 from app.db.models import UserBMI, Diet
-from tests.conftest import DummyTexts
 
 # Testing if data are been saving correctly in the DB
 def test_calculate_diet_with_mock(client, db_session):

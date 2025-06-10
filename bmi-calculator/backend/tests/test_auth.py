@@ -1,8 +1,7 @@
-from app.api.auth import hash_password, verify_password, create_access_token, get_current_user
 from unittest.mock import patch, MagicMock
 from jose import jwt
+from app.api.auth import hash_password, verify_password, create_access_token, get_current_user
 from app.api.config import SECRET_KEY, ALGORITHM
-
 from app.db.models import User
 
 
@@ -11,14 +10,12 @@ def test_hash_password():
     hashed_password = hash_password(password)
     assert hashed_password.startswith("$2b$")
 
-
 def test_verify_password_correct():
     assert verify_password("senha", hash_password("senha"))
     assert verify_password("lmao", hash_password("lmao"))
     assert verify_password("LOREM IPSUM", hash_password("LOREM IPSUM"))
     assert verify_password("senha123", hash_password("senha123"))
     assert verify_password("123456", hash_password("123456"))
-
 
 def test_verify_password_incorrect():
     assert not verify_password("senha123", hash_password("senha"))
@@ -53,8 +50,6 @@ def test_create_access_token():
             "fake.jwt.token.3",
             "fake.jwt.token.4",
         ]
-
-
 
 def test_get_current_user():
     emails = [

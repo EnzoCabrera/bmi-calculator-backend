@@ -2,7 +2,6 @@ from unittest.mock import patch
 from app.services.training_service import calculate_training, parse_training_description
 from app.db.models import Training, UserBMI
 
-
 # Testing if data are been saving correctly in the DB
 def test_calculate_training_with_mock(db_session):
     user_bmi = UserBMI(user_id=1, bmi_value=24.9, bmi_status_id=2)

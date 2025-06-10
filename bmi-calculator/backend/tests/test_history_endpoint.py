@@ -7,8 +7,6 @@ def test_get_history_by_id(client):
     assert response.status_code == 200
     data = response.json()
 
-    print(data)
-
     assert data["user_id"] == 1
     assert data["weight"] == 69
     assert data["bmi_value"] == 22.5
