@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from app.db.models import Base, Diet, UserBMI, User, Training
 from app.main import app
 from app.db.session import get_db
-from app.api.auth import get_current_user
+from app.api.auth import get_current_user, hash_password
 from datetime import datetime
 
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
@@ -29,11 +29,12 @@ def db_session():
 
 @pytest.fixture
 def populate_test_database(db_session):
+    password = hash_password("123")
     user = User(
         id=1,
         full_name="Test User",
         email="test@email.com",
-        password_hash="123",
+        password_hash=password,
         role=3
     )
     db_session.add(user)
