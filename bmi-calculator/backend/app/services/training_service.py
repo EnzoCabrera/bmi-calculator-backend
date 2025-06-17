@@ -54,9 +54,6 @@ def calculate_training(db: Session, user_bmi, bmi_status_id: int, user_id: int, 
 
     training_text = generate_training_with_openai(prompt)
 
-    parsed_training = parse_training_description(training_text)
-    print(parsed_training)
-
     training.description = training_text
     training.user_id = user_id
     training.bmi_status_id = bmi_status_id
