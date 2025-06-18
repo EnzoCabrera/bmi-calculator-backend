@@ -7,6 +7,7 @@ from app.main import app
 from app.db.session import get_db
 from app.api.auth import get_current_user, hash_password
 from datetime import datetime
+from app.services.endpoint_limit_service import post_rate_limiter, get_rate_limiter, auth_rate_limiter
 
 SQLALCHEMY_TEST_DATABASE_URL = "sqlite:///:memory:"
 
@@ -70,11 +71,18 @@ def populate_test_database(db_session):
 def client(db_session, populate_test_database):
     def override_get_db():
         yield db_session
-    app.dependency_overrides[get_db] = override_get_db
 
     def override_get_current_user():
         return db_session.query(User).filter(User.id == 1).first()
+
+    def override_rate_limiter():
+        pass
+
+    app.dependency_overrides[get_db] = override_get_db
     app.dependency_overrides[get_current_user] = override_get_current_user
+    app.dependency_overrides[post_rate_limiter] = override_rate_limiter
+    app.dependency_overrides[get_rate_limiter] = override_rate_limiter
+    app.dependency_overrides[auth_rate_limiter] = override_rate_limiter
 
     yield TestClient(app)
     app.dependency_overrides.clear()
