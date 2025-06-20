@@ -64,63 +64,63 @@ You can either run a local PostgreSQL instance using Docker or connect to your o
 
 You can start a PostgreSQL container with the following command:
 
--docker run --name postgres-bmi-fit -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=bmifit -p 5432:5432 -d postgres:15
+    -docker run --name postgres-bmi-fit -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=bmifit -p 5432:5432 -d postgres:15
 
 Set your environment variable in the backend with the following DATABASE_URL (example only):
 
-postgresql://postgres:postgres@localhost:5432/bmifit
+    postgresql://postgres:postgres@localhost:5432/bmifit
 
 🗄️ Redis Database
 
 Start a Redis instance locally with:
 
-docker run --name redis-bmi-fit -p 6379:6379 -d redis:alpine
+    docker run --name redis-bmi-fit -p 6379:6379 -d redis:alpine
 
 ▶️ Running the Backend
 
-    Clone the repository
+Clone the repository
 
-git clone https://github.com/EnzoCabrera/bmi-calculator-backend.git
-cd bmi-calculator-backend
+    git clone https://github.com/EnzoCabrera/bmi-calculator-backend.git
+    cd bmi-calculator-backend
 
-    Set environment variables
+Set environment variables
 
 Create a .env file inside the backend/ directory with the following content:
 
-user=your_db_user
-password=your_db_password
-host=your_db_host
-port=your_db_port
-dbname=your_db_name
+    user=your_db_user
+    password=your_db_password
+    host=your_db_host
+    port=your_db_port
+    dbname=your_db_name
+    
+    DATABASE_URL=postgresql://postgres:postgres@localhost:5432/bmifit  # Example only
+    
+    REDIS_HOST=your_redis_host
+    REDIS_PASSWORD=your_redis_password
+    REDIS_PORT=your_redis_port
+    
+    SECRET_KEY=your_secret_key
+    ALGORITHM="HS256"
+    ACCESS_TOKEN_EXPIRE_MINUTES=1000
+    
+    OPENAI_API_KEY=your_openai_key
 
-DATABASE_URL=postgresql://postgres:postgres@localhost:5432/bmifit  # Example only
+Start the backend using Docker Compose
 
-REDIS_HOST=your_redis_host
-REDIS_PASSWORD=your_redis_password
-REDIS_PORT=your_redis_port
-
-SECRET_KEY=your_secret_key
-ALGORITHM="HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES=1000
-
-OPENAI_API_KEY=your_openai_key
-
-    Start the backend using Docker Compose
-
-docker compose up --build
+    docker compose up --build
 
 The backend will be available at:
 
-http://localhost:8000
+    http://localhost:8000
 
 The interactive API documentation is available at:
 
-http://localhost:8000/docs
+    http://localhost:8000/docs
 
 🧬 Running Migrations with Alembic
 
 If you're using a fresh database, run the migrations with Alembic (either inside the container or in your Python environment):
 
-alembic upgrade head
+    alembic upgrade head
 
 
