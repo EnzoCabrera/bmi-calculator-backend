@@ -34,7 +34,7 @@ def create_training(db: Session = Depends(get_db), user: User = Depends(get_curr
     user_bmi = db.query(UserBMI).filter(UserBMI.user_id == user.id).first()
 
     if not user_bmi:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="IMC do usuário não encontrado.")
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Não foi possível encontrar seu IMC. Cadastre suas informações primeiro.')
     try:
         result = calculate_training(
             db=db,
@@ -63,14 +63,14 @@ def create_training(db: Session = Depends(get_db), user: User = Depends(get_curr
 def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     user_training: UserBMI = (
         db.query(UserBMI)
-        .filter(User.id == user.id)
+        .filter(UserBMI.user_id == user.id)
         .order_by(UserBMI.created_at.desc())
         .first()
     )
 
     if not user_training:
         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND, detail="Usuário não encontrado.")
+            status_code=status.HTTP_404_NOT_FOUND, detail='Não foi possível encontrar seu IMC. Cadastre suas informações primeiro.')
 
     training: Training = (
         db.query(Training)
@@ -78,6 +78,11 @@ def trainings_by_id(db: Session = Depends(get_db), user: User = Depends(get_curr
         .order_by(Training.id.desc())
         .first()
     )
+
+    if not training:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Você ainda não criou nenhum treino.')
+
+
 
     parsed = parse_training_description(training.description)
 

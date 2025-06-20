@@ -10,18 +10,28 @@ from datetime import datetime
 
 router = APIRouter(tags=["Bmi"])
 
+# Response from calculating bmi
+class BmiResponse(BaseModel):
+    bmi_status_id: int
+    bmi_value: float
+    weight: float
+    height: float
+    user_id: int
+    id: int
+    created_at: datetime
+
 # Request variables to calculate BMI
 class CalculateBMI(BaseModel):
     weight: float
     height: float
 
 # Calculating the user's BMI and saving it to the DB
-@router.post("/create", dependencies=[Depends(post_rate_limiter)])
+@router.post("/create", response_model=BmiResponse, dependencies=[Depends(post_rate_limiter)])
 def create_bmi(data: CalculateBMI, db: Session = Depends(get_db), user: User = Depends(get_current_user), _: None = Depends(check_bmi_limit)):
     if data.height <= 0:
-        raise HTTPException(status_code=400, detail="Altura deve ser maior que zero.")
+        raise HTTPException(status_code=400, detail='Informe uma altura válida (maior que zero).')
     if data.weight <= 0:
-        raise HTTPException(status_code=400, detail="Peso deve ser maior que zero.")
+        raise HTTPException(status_code=400, detail='Informe um peso válido (maior que zero).')
 
     try:
         result = calculate_bmi(
@@ -36,11 +46,11 @@ def create_bmi(data: CalculateBMI, db: Session = Depends(get_db), user: User = D
 
 
 # Endpoint to get user's bmi
-@router.get("/latest-by-id", dependencies=[Depends(get_rate_limiter)])
+@router.get("/latest-by-id", response_model=BmiResponse, dependencies=[Depends(get_rate_limiter)])
 def get_bmi(db: Session = Depends(get_db), user: User = Depends(get_current_user)):
         user_bmi: UserBMI = (db.query(UserBMI).filter(UserBMI.user_id == user.id).order_by(UserBMI.created_at.desc()).first())
 
         if not user_bmi:
-            raise HTTPException(status_code=404, detail="Usuário não encontrado.")
+            raise HTTPException(status_code=404, detail='Não conseguimos encontrar seu perfil. Verifique suas informações.')
 
         return user_bmi
